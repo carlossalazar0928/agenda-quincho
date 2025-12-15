@@ -188,7 +188,7 @@
         <span class="close" onclick="cerrarModal('modalValidacion')">&times;</span>
         
         <div class="modal-header-validation">
-<a href="https://imgbb.com/"><img src="https://i.ibb.co/q3d6Ktzm/logo-centro-asturiano2.png" alt="logo centro asturiano2" border="0"></a>
+            <a href="https://imgbb.com/"><img src="https://i.ibb.co/q3d6Ktzm/logo-centro-asturiano2.png" alt="logo centro asturiano2" border="0"></a>
             <h2>🔐 Validación de Socio</h2>
         </div>
 
@@ -358,7 +358,7 @@
       document.getElementById(id).classList.remove('activa');
     }
 
-    // 🚨 FUNCIONES PARA EL MODAL DE CARGA 🚨
+    // Funciones para el Modal de Carga
     function mostrarCargando(mensaje) {
         document.getElementById('loadingMessage').textContent = mensaje;
         document.getElementById('loadingModal').classList.add('activa');
@@ -367,7 +367,6 @@
     function ocultarCargando() {
         document.getElementById('loadingModal').classList.remove('activa');
     }
-    // ------------------------------------
 
     function toggleCheckbox(id) {
       document.getElementById(id).checked = !document.getElementById(id).checked;
@@ -398,7 +397,6 @@
         return;
       }
 
-      // Convertir la fecha de entrada (AAAA-MM-DD) a DD/MM/YYYY para la comparación interna
       const partes = fechaNacInput.split('-');
       const fechaNacAdminFormat = partes.length === 3 ? `${partes[2]}/${partes[1]}/${partes[0]}` : '';
 
@@ -415,8 +413,7 @@
       }
       
       // 2. **VALIDACIÓN NORMAL (Apps Script)**
-      
-      mostrarCargando("Verificando datos del socio..."); // 🚨 MOSTRAR CARGA 🚨
+      mostrarCargando("Verificando datos del socio...");
 
       fetch(`${APPS_SCRIPT_URL}?action=validarSocio&numSocio=${numSocio}&fechaNac=${fechaNacInput}`)
         .then(response => {
@@ -429,7 +426,7 @@
             });
         })
         .then(result => {
-          ocultarCargando(); // 🚨 OCULTAR CARGA 🚨
+          ocultarCargando();
           if (result.exito) {
             isAdmin = false;
             socioValidado = result.nombre || `Socio ${numSocio}`;
@@ -444,7 +441,7 @@
           }
         })
         .catch((error) => {
-          ocultarCargando(); // 🚨 OCULTAR CARGA 🚨
+          ocultarCargando();
           errorDiv.textContent = '❌ Error de red o CORS. Verifique la URL y el despliegue de Apps Script.';
           errorDiv.style.display = 'block';
           console.error("Fetch Error:", error);
@@ -452,8 +449,6 @@
     }
 
     function calcularTotal() {
-      // ... (Lógica de cálculo de totales, se mantiene igual) ...
-
       const tipoQuincho = document.getElementById('tipoQuincho').value;
       const fechaValor = document.getElementById('fechaEvento').value;
       
@@ -592,8 +587,8 @@
         listaInvitados: document.getElementById('listaInvitados').value
       };
 
-      cerrarModal('modalConfirmacion'); // Cierra el modal de confirmación
-      mostrarCargando("¡A la parrilla! Agendando el evento..."); // 🚨 MOSTRAR CARGA 🚨
+      cerrarModal('modalConfirmacion'); 
+      mostrarCargando("¡A la parrilla! Agendando el evento...");
 
       fetch(APPS_SCRIPT_URL, {
         method: 'POST',
@@ -601,12 +596,11 @@
         body: JSON.stringify(datos),
         headers: { 'Content-Type': 'application/json' }
       }).then(() => {
-        ocultarCargando(); // 🚨 OCULTAR CARGA 🚨
+        ocultarCargando();
         alert(`✅ ¡Agenda confirmada y enviada a la Administración! Total: $${totalCalculadoTexto}. Por favor, enviar comprobante de pago por WhatsApp.`);
         location.reload();
       }).catch(() => {
-        // En modo no-cors, la respuesta exitosa a menudo cae en catch
-        ocultarCargando(); // 🚨 OCULTAR CARGA 🚨
+        ocultarCargando();
         alert(`✅ ¡Agenda confirmada y enviada! Total: $${totalCalculadoTexto}. Revisar en Google Sheets. Por favor, enviar comprobante por WhatsApp.`);
         location.reload();
       });
