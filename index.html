@@ -151,7 +151,7 @@
     /* 🚨 ESTILOS PARA EL MODAL DE CARGA (Animación) 🚨 */
     #loadingModal {
         background: rgba(0, 0, 0, 0.9);
-        z-index: 10000; /* Asegura que esté por encima de todo */
+        z-index: 10000; 
         flex-direction: column;
         gap: 20px;
     }
@@ -160,7 +160,7 @@
         height: 150px;
         border-radius: 50%;
         object-fit: cover;
-        box-shadow: 0 0 30px rgba(255, 165, 0, 0.5); /* Sombra temática */
+        box-shadow: 0 0 30px rgba(255, 165, 0, 0.5); 
     }
     #loadingModal p {
         color: var(--blanco);
@@ -188,7 +188,7 @@
         <span class="close" onclick="cerrarModal('modalValidacion')">&times;</span>
         
         <div class="modal-header-validation">
-            <img src="https://i.ibb.co/q3d6Ktzm/logo-centro-asturiano2.png" alt="Logo Centro Asturiano">
+                        <img src="https://i.ibb.co/q3d6Ktzm/logo-centro-asturiano2.png" alt="Logo Centro Asturiano">
             <h2>🔐 Validación de Socio</h2>
         </div>
 
@@ -209,11 +209,12 @@
         </p>
       </div>
     </div>
-            <div id="loadingModal" class="modal">
-                <img src="https://i.gifer.com/N8nB.gif">
+        
+        <div id="loadingModal" class="modal">
+        <img src="https://i.gifer.com/N8nB.gif" alt="Cargando">
         <p id="loadingMessage">Procesando validación...</p>
     </div>
-            <div id="formAgendamiento" class="seccion card">
+        <div id="formAgendamiento" class="seccion card">
         <div id="adminIndicator" class="admin-session-indicator">
             MODO ADMINISTRADOR ACTIVO (No se registrará socio)
         </div>
@@ -310,7 +311,8 @@
         ✅ Confirmar Agenda
       </button>
     </div>
-            <div id="modalConfirmacion" class="modal">
+
+    <div id="modalConfirmacion" class="modal">
       <div class="modal-content">
         <span class="close" onclick="cerrarModal('modalConfirmacion')">&times;</span>
         <h2>📋 Detalle Final</h2>
@@ -337,7 +339,7 @@
         <button onclick="confirmarYGuardar()">💾 Confirmar y Guardar</button>
       </div>
     </div>
-      </div>
+  </div>
 
   <script>
     // 🚨 RECUERDA REEMPLAZAR ESTA URL CON LA URL DE TU APPS SCRIPT /exec
@@ -379,7 +381,6 @@
              document.getElementById('seguridad').checked = false;
         }
       }
-      // NOTA: Se eliminó la llamada a calcularTotal() de aquí para evitar el bucle infinito.
     }
 
     function validarSocio() {
@@ -394,7 +395,6 @@
         return;
       }
       
-      // CÓDIGO ANTES SUELTO, AHORA DENTRO DE validarSocio()
       const partes = fechaNacInput.split('-');
       const fechaNacAdminFormat = partes.length === 3 ? `${partes[2]}/${partes[1]}/${partes[0]}` : '';
 
@@ -612,6 +612,7 @@
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('tipoQuincho').addEventListener('change', calcularTotal); 
   calcularTotal();
+  // Esto activa el modal de validación al cargar. Si quieres que la página principal se vea primero, comenta la siguiente línea.
   document.getElementById('modalValidacion').classList.add('activa');
 });
   </script>
