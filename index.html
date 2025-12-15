@@ -215,7 +215,7 @@
     </div>
     
     <div id="loadingModal" class="modal">
-        <img src="https://i.ibb.co/68038Qk/grill-loading.gif" alt="Cargando: Bistec a la parrilla">
+        <img src="https://i.gifer.com/N8nB.gif">
         <p id="loadingMessage">Procesando validación...</p>
     </div>
 
@@ -389,11 +389,19 @@
       calcularTotal(); 
     }
 
-    function validarSocio() {
-      const numSocio = document.getElementById('numSocio').value;
-      const fechaNacInput = document.getElementById('fechaNac').value;
-      const errorDiv = document.getElementById('errorValidacion');
-      
+    // LÍNEA 389
+function toggleCamposTipo() {
+  const tipo = document.getElementById('tipoQuincho').value;
+  const seguridadGroup = document.getElementById('seguridad-group');
+  if (seguridadGroup) {
+    seguridadGroup.style.display = tipo === 'cerrado' ? 'flex' : 'none';
+    if (tipo !== 'cerrado') {
+          document.getElementById('seguridad').checked = false;
+    }
+  }
+  // ANTES: calcularTotal(); 
+  // DESPUÉS: ELIMINAR O COMENTAR LA LÍNEA DE ARRIBA
+}
       errorDiv.style.display = 'none';
       if (!numSocio || !fechaNacInput) {
         errorDiv.textContent = '❌ Por favor, ingrese ambos datos.';
