@@ -616,14 +616,11 @@
       });
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('tipoQuincho').addEventListener('change', calcularTotal); 
   calcularTotal();
-  // Desactivamos el modal de validación para ver el formulario
-  // document.getElementById('modalValidacion').classList.add('activa');
-
-  // Hacemos el formulario principal visible inmediatamente
-  document.getElementById('formAgendamiento').classList.add('activa'); 
+  document.getElementById('modalValidacion').classList.add('activa'); // <--- DESACTIVA O COMENTA ESTA LÍNEA
+  // document.getElementById('formAgendamiento').classList.add('activa'); // <--- AÑADE ESTA LÍNEA TEMPORALMENTE
 });
   </script>
 </body>
