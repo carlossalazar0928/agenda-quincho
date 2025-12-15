@@ -386,7 +386,6 @@
              document.getElementById('seguridad').checked = false;
         }
       }
-      calcularTotal(); 
     }
 
     // LÍNEA 389
@@ -402,13 +401,6 @@ function toggleCamposTipo() {
   // ANTES: calcularTotal(); 
   // DESPUÉS: ELIMINAR O COMENTAR LA LÍNEA DE ARRIBA
 }
-      errorDiv.style.display = 'none';
-      if (!numSocio || !fechaNacInput) {
-        errorDiv.textContent = '❌ Por favor, ingrese ambos datos.';
-        errorDiv.style.display = 'block';
-        return;
-      }
-
       const partes = fechaNacInput.split('-');
       const fechaNacAdminFormat = partes.length === 3 ? `${partes[2]}/${partes[1]}/${partes[0]}` : '';
 
