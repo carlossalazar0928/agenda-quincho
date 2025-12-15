@@ -31,9 +31,10 @@
       margin-bottom: 30px;
       padding: 20px;
     }
-    /* Estilos adaptados para el logo */
+    /* Estilos para el logo en el header principal (oculto en este flujo) */
     .header .logo-club {
         width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin-bottom: 15px;
+        display: none; /* Lo moveremos al modal */
     }
     .header h1 { 
       font-size: 2.5em; 
@@ -69,6 +70,23 @@
       cursor: pointer; transition: all 0.3s;
     }
     .close:hover { color: var(--rojo); transform: scale(1.1); }
+
+    /* Estilos para el encabezado del modal de validación */
+    .modal-header-validation {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    .modal-header-validation img {
+        width: 50px; 
+        height: 50px; 
+        margin-right: 15px;
+    }
+    .modal-header-validation h2 {
+        margin: 0;
+        color: var(--azul-primario);
+        font-size: 1.8em;
+    }
     
     .form-group { margin-bottom: 25px; }
     label { 
@@ -132,22 +150,14 @@
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     
     .auto-calculado { background: #dbeafe; font-style: italic; color: var(--azul-primario); }
+
+    .admin-session-indicator {
+        margin-top: -10px; margin-bottom: 20px; padding: 10px; background-color: var(--rojo);
+        color: white; font-weight: bold; border-radius: 10px; text-align: center; display: none;
+    }
     @media (max-width: 768px) { 
       .grid-2, .grid-3 { grid-template-columns: 1fr; }
       .card { padding: 20px; }
-    }
-    
-    /* 🚨 Estilo para identificar la sesión de administrador */
-    .admin-session-indicator {
-        margin-top: -10px;
-        margin-bottom: 20px;
-        padding: 10px;
-        background-color: var(--rojo);
-        color: white;
-        font-weight: bold;
-        border-radius: 10px;
-        text-align: center;
-        display: none; /* Se mostrará con JavaScript */
     }
   </style>
 </head>
@@ -163,7 +173,13 @@
     <div id="modalValidacion" class="modal">
       <div class="modal-content">
         <span class="close" onclick="cerrarModal('modalValidacion')">&times;</span>
-        <h2>🔐 Validación de Socio</h2>
+        
+        <div class="modal-header-validation">
+            <img src="https://i.ibb.co/cn7d3rJ/Gemini-Generated-Image-elm44qelm44qelm4.png" 
+                 alt="Logo del Club">
+            <h2>🔐 Validación de Socio</h2>
+        </div>
+
         <div class="form-group">
           <label>📱 Número de Socio</label>
           <input type="number" id="numSocio" placeholder="Ej: 12345">
@@ -194,13 +210,12 @@
 
       <div class="form-group">
         <label>🏷️ Tipo de Agenda</label>
-        <select id="tipoQuincho" onchange="toggleCamposTipo()">
-          <option value="">Seleccione...</option>
+        <select id="tipoQuincho" onchange="calcularTotal()"> <option value="">Seleccione...</option>
           <option value="cerrado">🎪 Quincho Cerrado (Max 60 personas, 3 eventos máx 6hs)</option>
           <option value="parrilla">🔥 Parrillas Externas (Sin límite tiempo/personas)</option>
         </select>
       </div>
-
+      
       <div class="grid-2">
         <div class="form-group">
           <label>📅 Fecha</label>
@@ -314,10 +329,10 @@
     
     // 🚨 Credenciales del Administrador 🚨
     const ADMIN_SOCIO = '99999';
-    const ADMIN_FECHA = '99/99/9999'; // El formato DD/MM/YYYY es crucial aquí
+    const ADMIN_FECHA = '99/99/9999'; 
     
     let socioValidado = '';
-    let isAdmin = false; // Nuevo flag para el modo administrador
+    let isAdmin = false; 
     const tarifasLunJue = {mayores: 6200, jubilados: 3900, juveniles: 5000, menores: 3500, infantiles: 0};
     const tarifasVieDom = {mayores: 7700, jubilados: 4900, juveniles: 5500, menores: 4000, infantiles: 0};
 
@@ -339,10 +354,10 @@
              document.getElementById('seguridad').checked = false;
         }
       }
-      calcularTotal();
+      // Llamamos a calcular total para reevaluar la deshabilitación del botón
+      calcularTotal(); 
     }
 
-    // 🚨 FUNCIÓN DE VALIDACIÓN MODIFICADA PARA AÑADIR EXCEPCIÓN DE ADMINISTRADOR
     function validarSocio() {
       const numSocio = document.getElementById('numSocio').value;
       const fechaNacInput = document.getElementById('fechaNac').value; // Formato AAAA-MM-DD
@@ -357,15 +372,16 @@
 
       // Convertir la fecha de entrada (AAAA-MM-DD) a DD/MM/YYYY para la comparación interna
       const partes = fechaNacInput.split('-'); // [YYYY, MM, DD]
-      const fechaNacAdminFormat = partes.length === 3 ? `${partes[2]}/${partes[1]}/${partes[0]}` : fechaNacInput;
+      // 🚨 CORRECCIÓN DE PARSING DE FECHA: Asegura DD/MM/YYYY para la comparación de admin
+      const fechaNacAdminFormat = partes.length === 3 ? `${partes[2]}/${partes[1]}/${partes[0]}` : '';
 
 
-      // 1. **CHECK DE ADMINISTRADOR (Frontend)**
+      // 1. **CHECK DE ADMINISTRADOR**
       if (numSocio === ADMIN_SOCIO && fechaNacAdminFormat === ADMIN_FECHA) {
           isAdmin = true;
           socioValidado = 'ADMINISTRADOR';
           document.getElementById('nombreSocio').value = 'ADMINISTRADOR (Acceso Especial)';
-          document.getElementById('adminIndicator').style.display = 'block'; // Muestra la advertencia
+          document.getElementById('adminIndicator').style.display = 'block'; 
           cerrarModal('modalValidacion');
           document.getElementById('formAgendamiento').classList.add('activa');
           calcularTotal();
@@ -374,17 +390,16 @@
       
       // 2. **VALIDACIÓN NORMAL (Apps Script)**
       
-      // Llamada AJAX a Apps Script (usando el formato YYYY-MM-DD para que el Apps Script lo maneje)
+      // Muestra spinner o deshabilita el botón aquí si quieres dar feedback
+      
       fetch(`${APPS_SCRIPT_URL}?action=validarSocio&numSocio=${numSocio}&fechaNac=${fechaNacInput}`)
         .then(response => {
-             // Manejo de la respuesta como texto primero para diagnosticar errores de servidor no JSON
             return response.text().then(text => {
                 try {
-                    return JSON.parse(text); // Intenta parsear como JSON si fue exitoso
+                    return JSON.parse(text); 
                 } catch (e) {
-                    // Si falla el parseo (ej: error 500 del Apps Script), muestra el texto
                     console.error("Error al parsear JSON:", text);
-                    return { exito: false, mensaje: 'Error de comunicación o servidor (Apps Script): ' + text.substring(0, 50) + '...'};
+                    return { exito: false, mensaje: 'Error de comunicación con Apps Script.'};
                 }
             });
         })
@@ -416,6 +431,9 @@
       let total = 0;
       let totalInvitados = 0;
       
+      // Primero, asegura que los campos del tipoQuincho se actualicen
+      toggleCamposTipo(); 
+      
       if (!tipoQuincho || !fechaValor) {
         document.getElementById('totalCalculado').textContent = '0';
         document.getElementById('totalDiv').style.display = 'none';
@@ -425,6 +443,8 @@
       }
 
       const fecha = new Date(fechaValor);
+      // ... (Lógica de cálculo de totales y bonificaciones, se mantiene igual) ...
+
       const diaSemana = fecha.getDay(); 
       const esVieDomFer = (diaSemana === 5 || diaSemana === 6 || diaSemana === 0);
       const tarifas = esVieDomFer ? tarifasVieDom : tarifasLunJue;
@@ -476,11 +496,44 @@
 
       document.getElementById('totalCalculado').textContent = Math.max(0, total).toLocaleString('es-AR');
       document.getElementById('totalDiv').style.display = total > 0 ? 'block' : 'none';
+      
+      // 🚨 HABILITACIÓN DEL BOTÓN 🚨
       document.getElementById('btnConfirmar').disabled = !tipoQuincho || !fechaValor || totalInvitados === 0;
     }
 
+    // 🚨 FUNCIÓN QUE NO DEBÍA FALTAR: Muestra el Modal de Confirmación 🚨
     function mostrarConfirmacion() {
-      // ... (Resto de la función sin cambios) ...
+      // Si el botón está deshabilitado por falta de datos, no hacemos nada
+      if (document.getElementById('btnConfirmar').disabled) return;
+      
+      const tipoSelect = document.getElementById('tipoQuincho');
+      const tipoTexto = tipoSelect.options[tipoSelect.selectedIndex].text;
+      const listaInvitadosTexto = document.getElementById('listaInvitados').value.trim();
+      const totalTexto = document.getElementById('totalCalculado').textContent;
+      
+      // Construir el HTML del detalle
+      const detalle = `
+        <div style="font-size: 1.1em; line-height: 1.6;">
+          <p><strong>👤 Socio:</strong> ${socioValidado} (#${document.getElementById('numSocio').value})</p>
+          <p><strong>🎪 Tipo:</strong> ${tipoTexto}</p>
+          <p><strong>🕒 Fecha/Hora:</strong> ${document.getElementById('fechaEvento').value}
+               ${document.getElementById('horaInicio').value} - ${document.getElementById('horaFin').value}</p>
+          <p><strong>👥 Total Invitados:</strong> ${document.getElementById('totalInvitados').value}</p>
+          <p><strong>📊 Detalle:</strong> May:${document.getElementById('mayores').value}
+               Jub:${document.getElementById('jubilados').value} Juv:${document.getElementById('juveniles').value}
+               Men:${document.getElementById('menores').value} Inf:${document.getElementById('infantiles').value}</p>
+          <p><strong>🎈 Adicionales:</strong>
+            ${document.getElementById('inflable').checked ? 'Inflable (+$20k)' : 'Sin Inflable'} /
+            ${document.getElementById('seguridad').checked && document.getElementById('seguridad-group').style.display !== 'none' ? 'Seguridad (+$20k)' : 'Sin Seguridad'}</p>
+          <p><strong>🎉 Cumpleañero:</strong> ${document.getElementById('cumpleanero').checked ? 'SÍ (Bonificación aplicada)' : 'NO'}</p>
+          <p><strong>💰 TOTAL A ABONAR:</strong> <strong style="color: var(--rojo);">$${totalTexto}</strong></p>
+          <p><strong>📝 Lista:</strong> ${listaInvitadosTexto ? listaInvitadosTexto.substring(0, 100) + (listaInvitadosTexto.length > 100 ? '...' : '') : 'No adjunta'}</p>
+        </div>
+      `;
+      document.getElementById('detalleAgenda').innerHTML = detalle;
+      
+      // ABRIR EL MODAL
+      document.getElementById('modalConfirmacion').classList.add('activa');
     }
 
     function confirmarYGuardar() {
@@ -490,22 +543,21 @@
       let fechaNacFinal = document.getElementById('fechaNac').value;
       let socioFinal = socioValidado;
 
-      // 🚨 Ajuste para Administrador: Se registra un valor de control
+      // Ajuste para Administrador: Se registra un valor de control
       if (isAdmin) {
           numSocioFinal = ADMIN_SOCIO;
-          fechaNacFinal = ADMIN_FECHA; // Mantenemos el formato de control
+          fechaNacFinal = ADMIN_FECHA; 
           socioFinal = 'ADMIN (ALTA MANUAL)';
       }
 
 
       const datos = {
         action: 'guardarAgenda',
-        numSocio: numSocioFinal, // '99999' si es admin
-        fechaNac: fechaNacFinal, // '99/99/9999' si es admin
-        socio: socioFinal, // 'ADMIN (ALTA MANUAL)' si es admin
+        numSocio: numSocioFinal,
+        fechaNac: fechaNacFinal,
+        socio: socioFinal,
         tipo: document.getElementById('tipoQuincho').value,
         fechaEvento: document.getElementById('fechaEvento').value,
-        // ... (resto de los campos se mantienen iguales)
         horaInicio: document.getElementById('horaInicio').value,
         horaFin: document.getElementById('horaFin').value,
         totalInvitados: document.getElementById('totalInvitados').value,
@@ -530,6 +582,7 @@
         alert(`✅ ¡Agenda confirmada y enviada a la Administración! Total: $${totalCalculadoTexto}. Por favor, enviar comprobante de pago por WhatsApp.`);
         location.reload();
       }).catch(() => {
+        // En modo no-cors, la respuesta exitosa a menudo cae en catch
         alert(`✅ ¡Agenda confirmada y enviada! Total: $${totalCalculadoTexto}. Revisar en Google Sheets. Por favor, enviar comprobante por WhatsApp.`);
         location.reload();
       });
@@ -541,11 +594,11 @@
       });
     }
 
-    // Inicializar
     document.addEventListener('DOMContentLoaded', () => {
+      // Agregamos el evento change al tipoQuincho para calcular el total
+      document.getElementById('tipoQuincho').addEventListener('change', calcularTotal); 
       calcularTotal();
       document.getElementById('modalValidacion').classList.add('activa');
-      toggleCamposTipo();
     });
   </script>
 </body>
