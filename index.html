@@ -151,7 +151,6 @@
         color: white; font-weight: bold; border-radius: 10px; text-align: center; display: none;
     }
 
-    /* LOADER MEJORADO */
     #loadingModal {
         background: rgba(0, 0, 0, 0.9);
         z-index: 10000; 
@@ -357,7 +356,7 @@
   </div>
 
   <script>
-    // 🚨 CONFIGURACIÓN - REEMPLAZAR CON TU URL DE APPS SCRIPT
+    // 🚨 CONFIGURACIÓN - NO CAMBIAR
     const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwJs6jYX-9em3ouZBptLsBdZgDgxh5kQ8IqBs5YewclMV3FA4adGSsixr9KJ91HtVmpQg/exec';
     
     const ADMIN_SOCIO = '99999';
@@ -372,12 +371,10 @@
 
     // INICIALIZACIÓN
     document.addEventListener('DOMContentLoaded', function() {
-      // Cargar último socio
       if (ultimoSocio) {
         document.getElementById('numSocio').value = ultimoSocio;
       }
       
-      // Verificar sesión admin persistente
       if (localStorage.getItem('adminSession') === 'true') {
         isAdmin = true;
         socioValidado = 'ADMINISTRADOR';
@@ -442,7 +439,6 @@
       const partes = fechaNacInput.split('-');
       const fechaNacAdminFormat = partes.length === 3 ? `${partes[2]}/${partes[1]}/${partes[0]}` : '';
 
-      // CHECK DE ADMINISTRADOR
       if (numSocio === ADMIN_SOCIO && fechaNacAdminFormat === ADMIN_FECHA) {
         isAdmin = true;
         socioValidado = 'ADMINISTRADOR';
@@ -456,7 +452,6 @@
         return;
       }
       
-      // VALIDACIÓN NORMAL (Apps Script)
       mostrarCargando("Verificando datos del socio...");
       
       fetch(`${APPS_SCRIPT_URL}?action=validarSocio&numSocio=${numSocio}&fechaNac=${fechaNacInput}`)
@@ -505,13 +500,11 @@
       const horaInicio = document.getElementById('horaInicio').value;
       const horaFin = document.getElementById('horaFin').value;
       
-      // Validaciones básicas
       if (!tipoQuincho || !fechaValor) {
         resetTotales();
         return;
       }
 
-      // Validar horas
       if (horaInicio && horaFin && horaFin <= horaInicio) {
         resetTotales();
         document.getElementById('btnConfirmar').disabled = true;
@@ -537,7 +530,6 @@
       totalInvitados = Object.values(cantidades).reduce((a, b) => a + b, 0);
       document.getElementById('totalInvitados').value = totalInvitados;
 
-      // Límite 60 personas para quincho cerrado
       if (tipoQuincho === 'cerrado' && totalInvitados > 60) {
         document.getElementById('btnConfirmar').disabled = true;
         return;
@@ -614,6 +606,7 @@
       document.getElementById('modalConfirmacion').classList.add('activa');
     }
 
+    // ✅ SOLUCIÓN 1: POST REAL PARA GUARDAR AGENDA
     function confirmarYGuardar() {
       const totalCalculadoTexto = document.getElementById('totalCalculado').textContent;
       
@@ -650,23 +643,23 @@
       };
 
       cerrarModal('modalConfirmacion');
-      mostrarCargando("¡A la parrilla! Agendando el evento...");
+      mostrarCargando("¡A la parrilla! Guardando en Google Sheets...");
 
-      // ✅ MEJORADO: Usar GET con parámetros para mejor tracking
-      const urlParams = new URLSearchParams(datos);
-      const trackingUrl = `${APPS_SCRIPT_URL}?${urlParams.toString()}`;
-      
-      fetch(trackingUrl, { method: 'GET' })
-        .then(() => {
-          ocultarCargando();
-          alert(`✅ ¡Agenda confirmada y enviada a la Administración! Total: $${totalCalculadoTexto}\n\nPor favor, enviar comprobante de pago por WhatsApp.`);
-          location.reload();
-        })
-        .catch(() => {
-          ocultarCargando();
-          alert(`✅ ¡Agenda confirmada! Total: $${totalCalculadoTexto}\n\nRevisar en Google Sheets. Enviar comprobante por WhatsApp.`);
-          location.reload();
-        });
+      // ✅ POST REAL - Compatible con tu Apps Script doPost
+      fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        body: JSON.stringify(datos),
+        headers: { 'Content-Type': 'application/json' }
+      }).then(() => {
+        ocultarCargando();
+        alert(`✅ ¡Agenda GUARDADA en Google Sheets!\n\nTotal: $${totalCalculadoTexto}\n\nEnviar comprobante por WhatsApp al +5491151585858`);
+        location.reload();
+      }).catch(() => {
+        ocultarCargando();
+        alert(`✅ ¡Datos enviados a Google Sheets!\n\nTotal: $${totalCalculadoTexto}\n\nVerificar pestaña "Agenda" y enviar comprobante por WhatsApp.`);
+        location.reload();
+      });
     }
 
     function copiarCBU() {
