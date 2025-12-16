@@ -32,7 +32,6 @@
       padding: 20px;
     }
     
-    .header .logo-club { display: none; }
     .header h1 { 
       font-size: 2.5em; 
       background: linear-gradient(45deg, var(--amarillo), var(--blanco));
@@ -148,20 +147,28 @@
         color: white; font-weight: bold; border-radius: 10px; text-align: center; display: none;
     }
 
-    /* 🚨 ESTILOS PARA EL MODAL DE CARGA (Animación) 🚨 */
+    /* 🚨 ESTILOS PARA EL NUEVO LOADER DE CSS (Sin GIF) 🚨 */
     #loadingModal {
         background: rgba(0, 0, 0, 0.9);
         z-index: 10000; 
         flex-direction: column;
         gap: 20px;
     }
-    #loadingModal img {
-        width: 150px;
-        height: 150px;
+
+    .loader-spinner {
+        border: 8px solid var(--blanco); /* Light grey */
+        border-top: 8px solid var(--amarillo); /* Yellow */
         border-radius: 50%;
-        object-fit: cover;
-        box-shadow: 0 0 30px rgba(255, 165, 0, 0.5); 
+        width: 80px;
+        height: 80px;
+        animation: spin 2s linear infinite;
     }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
     #loadingModal p {
         color: var(--blanco);
         font-size: 1.5em;
@@ -188,7 +195,7 @@
         <span class="close" onclick="cerrarModal('modalValidacion')">&times;</span>
         
         <div class="modal-header-validation">
-                        <img src="https://i.ibb.co/q3d6Ktzm/logo-centro-asturiano2.png" alt="Logo Centro Asturiano">
+            <img src="https://i.ibb.co/q3d6Ktzm/logo-centro-asturiano2.png" alt="Logo Centro Asturiano">
             <h2>🔐 Validación de Socio</h2>
         </div>
 
@@ -211,7 +218,7 @@
     </div>
         
         <div id="loadingModal" class="modal">
-        <img src="#" alt="Cargando">
+        <div class="loader-spinner"></div>
         <p id="loadingMessage">Procesando validación...</p>
     </div>
         <div id="formAgendamiento" class="seccion card">
@@ -612,7 +619,6 @@
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('tipoQuincho').addEventListener('change', calcularTotal); 
   calcularTotal();
-  // Esto activa el modal de validación al cargar. Si quieres que la página principal se vea primero, comenta la siguiente línea.
   document.getElementById('modalValidacion').classList.add('activa');
 });
   </script>
