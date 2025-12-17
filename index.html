@@ -302,23 +302,23 @@
       <h3>👨‍👩‍👧‍👦 Invitados por Edad</h3>
       <div class="grid-3">
         <div class="form-group">
-          <label>👨‍🦰 Mayores (18+)</label>
+          <label>👨‍🦰 Mayores (18+) <span id="precioMayores"></span></label>
           <input type="number" id="mayores" min="0" value="0" onchange="calcularTotal()">
         </div>
         <div class="form-group">
-          <label>👴 Jubilados</label>
+          <label>👴 Jubilados <span id="precioJubilados"></span></label>
           <input type="number" id="jubilados" min="0" value="0" onchange="calcularTotal()">
         </div>
         <div class="form-group">
-          <label>🧒 Juveniles (13-17)</label>
+          <label>🧒 Juveniles (13-17) <span id="precioJuveniles"></span></label>
           <input type="number" id="juveniles" min="0" value="0" onchange="calcularTotal()">
         </div>
         <div class="form-group">
-          <label>👦 Menores (5-12)</label>
+          <label>👦 Menores (5-12) <span id="precioMenores"></span></label>
           <input type="number" id="menores" min="0" value="0" onchange="calcularTotal()">
         </div>
         <div class="form-group">
-          <label>👶 Infantiles (0-4)</label>
+          <label>👶 Infantiles (0-4) <span id="precioInfantiles"></span></label>
           <input type="number" id="infantiles" min="0" value="0" onchange="calcularTotal()">
         </div>
       </div>
@@ -398,6 +398,7 @@
     let socioValidado = '';
     let isAdmin = false;
     let ultimoSocio = localStorage.getItem('ultimoSocio') || '';
+    let tarifasActuales = {};
     
     const tarifasLunJue = {mayores: 6200, jubilados: 3900, juveniles: 5000, menores: 3500, infantiles: 0};
     const tarifasVieDom = {mayores: 7700, jubilados: 4900, juveniles: 5500, menores: 4000, infantiles: 0};
@@ -424,6 +425,22 @@
     function setMinDate() {
       const hoy = new Date().toISOString().split('T')[0];
       document.getElementById('fechaEvento').min = hoy;
+    }
+
+    function actualizarPreciosTarifa() {
+      const fechaValor = document.getElementById('fechaEvento').value;
+      if (!fechaValor) return;
+      
+      const fecha = new Date(fechaValor);
+      const diaSemana = fecha.getDay();
+      const esVieDomFer = (diaSemana === 5 || diaSemana === 6 || diaSemana === 0);
+      tarifasActuales = esVieDomFer ? tarifasVieDom : tarifasLunJue;
+      
+      document.getElementById('precioMayores').textContent = `ARS $${tarifasActuales.mayores.toLocaleString('es-AR')}`;
+      document.getElementById('precioJubilados').textContent = `ARS $${tarifasActuales.jubilados.toLocaleString('es-AR')}`;
+      document.getElementById('precioJuveniles').textContent = `ARS $${tarifasActuales.juveniles.toLocaleString('es-AR')}`;
+      document.getElementById('precioMenores').textContent = `ARS $${tarifasActuales.menores.toLocaleString('es-AR')}`;
+      document.getElementById('precioInfantiles').textContent = `ARS $${tarifasActuales.infantiles.toLocaleString('es-AR')}`;
     }
 
     function logoutAdmin() {
@@ -539,7 +556,7 @@
       }
 
       const hoy = new Date().toISOString().split('T')[0];
-      if (fechaValor < hoy || fechaValor === hoy && new Date().getHours() >= 18) {
+      if (fechaValor < hoy || (fechaValor === hoy && new Date().getHours() >= 18)) {
         resetTotales();
         document.getElementById('btnConfirmar').disabled = true;
         return;
@@ -550,6 +567,9 @@
         document.getElementById('btnConfirmar').disabled = true;
         return;
       }
+      
+      // Actualizar precios visibles
+      actualizarPreciosTarifa();
       
       // ✅ DETECCIÓN AUTOMÁTICA SEGURIDAD 00:01-05:00
       const inicioH = parseInt(horaInicio.split(':')[0]);
