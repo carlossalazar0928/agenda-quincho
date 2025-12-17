@@ -284,14 +284,14 @@
           <input type="date" id="fechaEvento" min="" onchange="setMinDate(); calcularTotal()">
         </div>
         <div class="form-group">
-          <label>⏰ Hora Inicio (Manual)</label>
-          <input type="time" id="horaInicio" onchange="calcularTotal()">
+          <label>⏰ Hora Inicio (24hs Militar)</label>
+          <input type="time" id="horaInicio" step="3600" onchange="calcularTotal()" placeholder="HH:00">
         </div>
       </div>
       <div class="grid-2">
         <div class="form-group">
-          <label>⏰ Hora Fin (Manual)</label>
-          <input type="time" id="horaFin" onchange="calcularTotal()">
+          <label>⏰ Hora Fin (24hs Militar)</label>
+          <input type="time" id="horaFin" step="3600" onchange="calcularTotal()" placeholder="HH:00">
         </div>
         <div class="form-group">
           <label>👥 Invitados Aprox <small>(Auto-calculado)</small></label>
@@ -571,7 +571,7 @@
       // Actualizar precios visibles
       actualizarPreciosTarifa();
       
-      // ✅ DETECCIÓN AUTOMÁTICA SEGURIDAD 00:01-05:00
+      // ✅ DETECCIÓN AUTOMÁTICA SEGURIDAD 00:01-05:00 (formato 24hs)
       const inicioH = parseInt(horaInicio.split(':')[0]);
       const finH = parseInt(horaFin.split(':')[0]);
       const necesitaSeguridad = (inicioH >= 0 && inicioH <= 5) || (finH >= 0 && finH <= 5) || (inicioH > finH);
@@ -658,7 +658,7 @@
         <div style="font-size: 1.1em; line-height: 1.6;">
           <p><strong>👤 Socio:</strong> ${socioValidado} (#${document.getElementById('numSocio').value})</p>
           <p><strong>🎪 Tipo:</strong> ${tipoTexto}</p>
-          <p><strong>🕒 Fecha/Hora:</strong> ${document.getElementById('fechaEvento').value}
+          <p><strong>🕒 Fecha/Hora (24hs):</strong> ${document.getElementById('fechaEvento').value}
                ${document.getElementById('horaInicio').value} - ${document.getElementById('horaFin').value}</p>
           <p><strong>👥 Total Invitados:</strong> ${document.getElementById('totalInvitados').value}</p>
           <p><strong>📊 Detalle:</strong> May:${document.getElementById('mayores').value}
