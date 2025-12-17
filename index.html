@@ -647,15 +647,16 @@
       // Actualizar precios visibles
       actualizarPreciosTarifa();
       
-      // ✅ CORREGIDO: DETECCIÓN SEGURIDAD - SOLO HORA FINAL 00:01-05:00
+      // ✅ CORREGIDO DEFINITIVO: SOLO HORA FINAL entre 00:01-05:00 (no importa si cruza día)
       const finH = parseInt(horaFin.split(':')[0]);
       const necesitaSeguridad = (finH >= 0 && finH <= 5);
+      
       const seguridadCheckbox = document.getElementById('seguridad');
       seguridadCheckbox.checked = necesitaSeguridad;
       document.getElementById('seguridad-group').className = necesitaSeguridad ? 'checkbox-group auto' : 'checkbox-group';
-      seguridadCheckbox.disabled = necesitaSeguridad;
+      seguridadCheckbox.disabled = true; // Siempre disabled
       
-      // MOSTRAR ALERTA ANIMADA SI HORA FINAL REQUIERE SEGURIDAD
+      // MOSTRAR ALERTA ANIMADA SOLO SI HORA FINAL está en 00:01-05:00
       if (necesitaSeguridad) {
         mostrarAlertaSeguridad();
       }
