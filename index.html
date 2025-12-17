@@ -81,6 +81,50 @@
     }
     @keyframes slideIn { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
     
+    /* ALERTA SEGURIDAD ANIMADA */
+    .seguridad-alerta {
+      display: none;
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 10001;
+      background: linear-gradient(135deg, var(--rojo), #b91c1c);
+      color: white;
+      padding: 25px 30px;
+      border-radius: 20px;
+      box-shadow: 0 25px 50px rgba(220,38,38,0.5);
+      backdrop-filter: blur(10px);
+      border: 3px solid rgba(255,255,255,0.2);
+      max-width: 400px;
+      animation: slideInRight 0.5s ease, pulseSeguridad 2s infinite 1s;
+      font-weight: 600;
+    }
+    @keyframes slideInRight {
+      from { transform: translateX(400px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes pulseSeguridad {
+      0%, 100% { transform: scale(1); box-shadow: 0 25px 50px rgba(220,38,38,0.5); }
+      50% { transform: scale(1.02); box-shadow: 0 30px 60px rgba(220,38,38,0.7); }
+    }
+    .seguridad-iconos {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 15px;
+      font-size: 2em;
+    }
+    .close-alerta {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 24px;
+      cursor: pointer;
+      opacity: 0.8;
+      transition: opacity 0.3s;
+    }
+    .close-alerta:hover { opacity: 1; }
+    
     .close { 
       position: absolute; right: 20px; top: 20px; font-size: 30px; color: var(--gris); 
       cursor: pointer; transition: all 0.3s;
@@ -212,10 +256,25 @@
       .card { padding: 20px; }
       .header-logo { flex-direction: column; gap: 10px; }
       .header-logo img { width: 60px; height: 60px; }
+      .seguridad-alerta { right: 10px; left: 10px; max-width: none; }
     }
   </style>
 </head>
 <body>
+  <!-- ALERTA SEGURIDAD ANIMADA -->
+  <div id="seguridadAlerta" class="seguridad-alerta">
+    <span class="close-alerta" onclick="cerrarAlertaSeguridad()">&times;</span>
+    <div class="seguridad-iconos">
+      <span>📢</span>
+      <span>👮‍♂️</span>
+    </div>
+    <div style="font-size: 1.1em; line-height: 1.5;">
+      <strong>¡ATENCIÓN SEGURIDAD!</strong><br>
+      Para reuniones pasadas las <strong>00:00hs</strong> se tiene que abonar la seguridad correspondiente a <strong>5 horas ($20.000)</strong><br>
+      <small style="font-weight: normal;">(para estos casos comunicarlo al número de ADM)</small>
+    </div>
+  </div>
+
   <div class="container">
     <div class="header">
       <div class="header-logo">
@@ -399,6 +458,7 @@
     let isAdmin = false;
     let ultimoSocio = localStorage.getItem('ultimoSocio') || '';
     let tarifasActuales = {};
+    let alertaMostrada = false;
     
     const tarifasLunJue = {mayores: 6200, jubilados: 3900, juveniles: 5000, menores: 3500, infantiles: 0};
     const tarifasVieDom = {mayores: 7700, jubilados: 4900, juveniles: 5500, menores: 4000, infantiles: 0};
@@ -421,6 +481,22 @@
         document.getElementById('modalValidacion').classList.add('activa');
       }
     });
+
+    function mostrarAlertaSeguridad() {
+      if (alertaMostrada) return;
+      alertaMostrada = true;
+      document.getElementById('seguridadAlerta').style.display = 'block';
+      
+      // Auto cerrar después de 8 segundos
+      setTimeout(() => {
+        cerrarAlertaSeguridad();
+      }, 8000);
+    }
+
+    function cerrarAlertaSeguridad() {
+      document.getElementById('seguridadAlerta').style.display = 'none';
+      alertaMostrada = false;
+    }
 
     function setMinDate() {
       const hoy = new Date().toISOString().split('T')[0];
@@ -571,14 +647,18 @@
       // Actualizar precios visibles
       actualizarPreciosTarifa();
       
-      // ✅ DETECCIÓN AUTOMÁTICA SEGURIDAD 00:01-05:00 (formato 24hs)
-      const inicioH = parseInt(horaInicio.split(':')[0]);
+      // ✅ CORREGIDO: DETECCIÓN SEGURIDAD - SOLO HORA FINAL 00:01-05:00
       const finH = parseInt(horaFin.split(':')[0]);
-      const necesitaSeguridad = (inicioH >= 0 && inicioH <= 5) || (finH >= 0 && finH <= 5) || (inicioH > finH);
+      const necesitaSeguridad = (finH >= 0 && finH <= 5);
       const seguridadCheckbox = document.getElementById('seguridad');
       seguridadCheckbox.checked = necesitaSeguridad;
       document.getElementById('seguridad-group').className = necesitaSeguridad ? 'checkbox-group auto' : 'checkbox-group';
       seguridadCheckbox.disabled = necesitaSeguridad;
+      
+      // MOSTRAR ALERTA ANIMADA SI HORA FINAL REQUIERE SEGURIDAD
+      if (necesitaSeguridad) {
+        mostrarAlertaSeguridad();
+      }
       
       let total = 0;
       let totalInvitados = 0;
